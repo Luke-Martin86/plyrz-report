@@ -477,60 +477,172 @@ async function submitReport(){
   overlay.innerHTML = '<div class="spinner"></div><p>Sending report…</p>';
   document.body.appendChild(overlay);
 
-  // Build message body
+  // Build styled HTML email
   const playerName = state.c_name || 'Unknown Player';
-  const body = `
-PLYRZ PLAYER DEVELOPMENT REPORT
-================================
-Player: ${state.c_name||'–'}
-Age Group: ${state.c_age||'–'}
-Position: ${state.c_pos||'–'}
-Club: ${state.c_club||'–'}
-Competition: ${state.c_comp||'–'}
-Scout: ${state.c_scout||'–'}
-Date: ${state.c_date||'–'}
 
-TECHNICAL SCORES
-Dribbling: ${scores.dribbling||'–'}/10
-Shooting: ${scores.shooting||'–'}/10
-Passing: ${scores.passing||'–'}/10
-Receiving: ${scores.receiving||'–'}/10
-Notes: ${state.nt_technical||'–'}
+  function scoreBar(val){
+    const v = val||0;
+    let col = '#4a6580';
+    if(v>8) col='#00e8a2';
+    else if(v>6) col='#4fc8ff';
+    else if(v>3) col='#ffc93c';
+    return `<div style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden">
+        <div style="width:${v*10}%;height:100%;background:${col};border-radius:99px"></div>
+      </div>
+      <span style="font-size:12px;color:${col};font-weight:700;min-width:32px">${v||'–'}/10</span>
+    </div>`;
+  }
 
-PHYSICAL SCORES
-Agility: ${scores.agility||'–'}/10
-Balance: ${scores.balance||'–'}/10
-Speed: ${scores.speed||'–'}/10
-Strength: ${scores.strength||'–'}/10
-Notes: ${state.nt_physical||'–'}
+  function attrRow(label, id){
+    return `<tr>
+      <td style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:14px;font-weight:600;color:#e4ede8;width:50%">${label}</td>
+      <td style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);width:50%">${scoreBar(scores[id])}</td>
+    </tr>`;
+  }
 
-TACTICAL SCORES
-Awareness: ${scores.awareness||'–'}/10
-Decision Making: ${scores.decision||'–'}/10
-Team Structure: ${scores.structure||'–'}/10
-Game Management: ${scores.gamemanagement||'–'}/10
-Notes: ${state.nt_tactical||'–'}
+  function section(eyebrow, title, rows, notes){
+    return `
+    <div style="margin-bottom:24px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:4px">${eyebrow}</div>
+      <div style="font-family:Georgia,serif;font-size:28px;letter-spacing:2px;color:#e4ede8;margin-bottom:14px;text-transform:uppercase">${title}</div>
+      <table style="width:100%;border-collapse:collapse;background:#112240;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.08)">
+        <thead><tr>
+          <th style="padding:10px 16px;background:rgba(0,232,162,0.08);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;text-align:left;font-weight:700">Attribute</th>
+          <th style="padding:10px 16px;background:rgba(0,232,162,0.08);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;text-align:left;font-weight:700">Score</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      ${notes ? `<div style="margin-top:10px;background:#112240;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;margin-bottom:6px">Observations</div>
+        <div style="font-size:14px;color:#c0d4e4;line-height:1.7">${notes||'–'}</div>
+      </div>` : ''}
+    </div>`;
+  }
 
-PSYCHO-SOCIAL SCORES
-Confidence: ${scores.confidence||'–'}/10
-Competitive Spirit: ${scores.competitive||'–'}/10
-Concentration: ${scores.concentration||'–'}/10
-Communication: ${scores.communication||'–'}/10
-Notes: ${state.nt_psychosocial||'–'}
+  const catAvgHtml = [
+    {label:'Technical',keys:['dribbling','shooting','passing','receiving']},
+    {label:'Physical',keys:['agility','balance','speed','strength']},
+    {label:'Tactical',keys:['awareness','decision','structure','gamemanagement']},
+    {label:'Psycho-Soc',keys:['confidence','competitive','concentration','communication']},
+  ].map(cat => {
+    const s = cat.keys.map(k=>scores[k]||0).filter(v=>v>0);
+    const avg = s.length ? (s.reduce((a,b)=>a+b,0)/s.length).toFixed(1) : '–';
+    let col = '#4a6580';
+    if(avg!=='–'){if(+avg>8)col='#00e8a2';else if(+avg>6)col='#4fc8ff';else if(+avg>3)col='#ffc93c';}
+    return `<td style="text-align:center;padding:16px 8px;background:#112240;border-radius:12px;border:1px solid rgba(255,255,255,0.08)">
+      <div style="font-family:Georgia,serif;font-size:32px;color:${col};font-weight:700">${avg}</div>
+      <div style="font-size:10px;color:#7a9bb5;margin-top:4px;font-weight:600">${cat.label}</div>
+    </td>`;
+  }).join('<td style="width:8px"></td>');
 
-SUMMARY
-Strengths: ${state.sum_strengths||'–'}
-Areas to Improve: ${state.sum_improve||'–'}
-Next Steps: ${state.sum_next||'–'}
+  const body = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#0d1b2a;font-family:Outfit,-apple-system,sans-serif">
+<div style="max-width:600px;margin:0 auto;padding:24px 16px">
 
-FINAL RECOMMENDATION
-${state.rec_main||'–'}
+  <!-- HEADER -->
+  <div style="text-align:center;padding:32px 24px;background:linear-gradient(160deg,#0a2540,#0d1b2a);border-radius:16px;border:1px solid rgba(255,255,255,0.08);margin-bottom:24px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:8px">Player Development Program</div>
+    <div style="font-family:Georgia,serif;font-size:42px;letter-spacing:4px;color:#e4ede8;text-transform:uppercase;line-height:1">PLAYER</div>
+    <div style="font-family:Georgia,serif;font-size:24px;letter-spacing:3px;color:#00e8a2;text-transform:uppercase;margin-top:4px">Development Report</div>
+  </div>
 
-Scout: ${state.rec_scout||'–'}
-Organisation: ${state.rec_org||'–'}
-Date: ${state.rec_date||'–'}
-Signature: ${state.rec_sig||'–'}
-  `.trim();
+  <!-- PLAYER INFO -->
+  <div style="background:#112240;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;margin-bottom:24px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:14px">Player Information</div>
+    <table style="width:100%;border-collapse:collapse">
+      <tr>
+        <td style="padding:6px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7a9bb5;width:40%">Player Name</td>
+        <td style="padding:6px 0;font-size:15px;font-weight:600;color:#e4ede8">${state.c_name||'–'}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7a9bb5">Age Group</td>
+        <td style="padding:6px 0;font-size:15px;font-weight:600;color:#e4ede8">${state.c_age||'–'}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7a9bb5">Position</td>
+        <td style="padding:6px 0;font-size:15px;font-weight:600;color:#e4ede8">${state.c_pos||'–'}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7a9bb5">Club</td>
+        <td style="padding:6px 0;font-size:15px;font-weight:600;color:#e4ede8">${state.c_club||'–'}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7a9bb5">Competition</td>
+        <td style="padding:6px 0;font-size:15px;font-weight:600;color:#e4ede8">${state.c_comp||'–'}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7a9bb5">Scout</td>
+        <td style="padding:6px 0;font-size:15px;font-weight:600;color:#e4ede8">${state.c_scout||'–'}</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 0;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7a9bb5">Date</td>
+        <td style="padding:6px 0;font-size:15px;font-weight:600;color:#e4ede8">${state.c_date||'–'}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- CATEGORY AVERAGES -->
+  <div style="margin-bottom:24px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:10px">Category Averages</div>
+    <table style="width:100%;border-collapse:separate;border-spacing:0"><tr>${catAvgHtml}</tr></table>
+  </div>
+
+  <!-- SCORES -->
+  ${section('Category 01','Technical',
+    attrRow('Dribbling','dribbling')+attrRow('Shooting','shooting')+attrRow('Passing','passing')+attrRow('Receiving','receiving'),
+    state.nt_technical)}
+
+  ${section('Category 02','Physical',
+    attrRow('Agility','agility')+attrRow('Balance','balance')+attrRow('Speed','speed')+attrRow('Strength','strength'),
+    state.nt_physical)}
+
+  ${section('Category 03','Tactical',
+    attrRow('Awareness','awareness')+attrRow('Decision Making','decision')+attrRow('Team Structure','structure')+attrRow('Game Management','gamemanagement'),
+    state.nt_tactical)}
+
+  ${section('Category 04','Psycho-Social',
+    attrRow('Confidence','confidence')+attrRow('Competitive Spirit','competitive')+attrRow('Concentration','concentration')+attrRow('Communication','communication'),
+    state.nt_psychosocial)}
+
+  <!-- SUMMARY -->
+  <div style="margin-bottom:24px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:4px">Overview</div>
+    <div style="font-family:Georgia,serif;font-size:28px;letter-spacing:2px;color:#e4ede8;margin-bottom:14px;text-transform:uppercase">Player Summary</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:#112240;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;margin-bottom:6px">Strengths</div>
+        <div style="font-size:14px;color:#c0d4e4;line-height:1.7">${state.sum_strengths||'–'}</div>
+      </div>
+      <div style="background:#112240;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;margin-bottom:6px">Areas to Improve</div>
+        <div style="font-size:14px;color:#c0d4e4;line-height:1.7">${state.sum_improve||'–'}</div>
+      </div>
+      <div style="background:#112240;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;margin-bottom:6px">Next Steps</div>
+        <div style="font-size:14px;color:#c0d4e4;line-height:1.7">${state.sum_next||'–'}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL -->
+  <div style="background:rgba(0,232,162,0.06);border:1px solid rgba(0,232,162,0.2);border-radius:12px;padding:20px;margin-bottom:24px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:10px">Final Recommendation</div>
+    <div style="font-size:14px;color:#c0d4e4;line-height:1.7;margin-bottom:16px">${state.rec_main||'–'}</div>
+    <div style="border-top:1px solid rgba(0,232,162,0.15);padding-top:14px;display:flex;flex-wrap:wrap;gap:16px">
+      <div><div style="font-size:10px;color:#7a9bb5;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Scout</div><div style="font-size:14px;font-weight:600;color:#e4ede8">${state.rec_scout||'–'}</div></div>
+      <div><div style="font-size:10px;color:#7a9bb5;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Organisation</div><div style="font-size:14px;font-weight:600;color:#e4ede8">${state.rec_org||'–'}</div></div>
+      <div><div style="font-size:10px;color:#7a9bb5;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">Date</div><div style="font-size:14px;font-weight:600;color:#e4ede8">${state.rec_date||'–'}</div></div>
+    </div>
+    <div style="margin-top:14px;text-align:center;font-size:22px;color:#e4ede8;font-style:italic;border-top:1px solid rgba(0,232,162,0.15);padding-top:14px">${state.rec_sig||'–'}</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="text-align:center;padding:16px;font-size:11px;color:#4a6580;letter-spacing:2px;text-transform:uppercase">PLYRZ © 2026 — Player Development Program</div>
+
+</div>
+</body></html>`;
 
   try {
     const res = await fetch('https://formspree.io/f/mbdwlryd', {
@@ -538,7 +650,7 @@ Signature: ${state.rec_sig||'–'}
       headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
       body: JSON.stringify({
         _subject: `PLYRZ Report – ${playerName}`,
-        message: body,
+        _html: body,
         player: playerName,
         scout: state.c_scout||'–',
         date: state.c_date||'–',
