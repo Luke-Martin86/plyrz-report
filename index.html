@@ -114,6 +114,28 @@ html, body { height: 100%; background: var(--dark); color: var(--text); font-fam
 .toast { position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--mint); color: #0d1b2a; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; transition: all 0.3s; z-index: 200; white-space: nowrap; pointer-events: none; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+.submit-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 16px; padding: 16px;
+  background: var(--mint); color: #0d1b2a;
+  border: none; border-radius: 12px;
+  font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: opacity .2s;
+}
+.submit-btn:active { opacity: .8; }
+.submit-btn:disabled { opacity: .4; pointer-events: none; }
+.sending-overlay {
+  position: fixed; inset: 0; background: rgba(13,27,42,0.92);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 999; gap: 16px;
+}
+.sending-overlay p { font-size: 15px; font-weight: 600; color: var(--text); }
+.spinner {
+  width: 40px; height: 40px; border: 3px solid rgba(0,232,162,0.2);
+  border-top-color: var(--mint); border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -241,6 +263,10 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
           <div class="sig-label">Signature</div>
           <input type="text" class="sig-input" data-key="rec_sig" placeholder="Sign here…">
         </div>
+        <button class="submit-btn" onclick="submitReport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit Report
+        </button>
       </div>
     </div>
 
@@ -439,6 +465,110 @@ function renderCatAvg(){
     const col=avg==='–'?'var(--muted)':scoreColor(+avg);
     return`<div class="cat-card"><span class="cat-score" style="color:${col}">${avg}</span><div class="cat-label">${cat.label}</div></div>`;
   }).join('');
+}
+
+async function submitReport(){
+  const btn = document.querySelector('.submit-btn');
+  btn.disabled = true;
+
+  // Show sending overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'sending-overlay';
+  overlay.innerHTML = '<div class="spinner"></div><p>Sending report…</p>';
+  document.body.appendChild(overlay);
+
+  // Build message body
+  const playerName = state.c_name || 'Unknown Player';
+  const body = `
+PLYRZ PLAYER DEVELOPMENT REPORT
+================================
+Player: ${state.c_name||'–'}
+Age Group: ${state.c_age||'–'}
+Position: ${state.c_pos||'–'}
+Club: ${state.c_club||'–'}
+Competition: ${state.c_comp||'–'}
+Scout: ${state.c_scout||'–'}
+Date: ${state.c_date||'–'}
+
+TECHNICAL SCORES
+Dribbling: ${scores.dribbling||'–'}/10
+Shooting: ${scores.shooting||'–'}/10
+Passing: ${scores.passing||'–'}/10
+Receiving: ${scores.receiving||'–'}/10
+Notes: ${state.nt_technical||'–'}
+
+PHYSICAL SCORES
+Agility: ${scores.agility||'–'}/10
+Balance: ${scores.balance||'–'}/10
+Speed: ${scores.speed||'–'}/10
+Strength: ${scores.strength||'–'}/10
+Notes: ${state.nt_physical||'–'}
+
+TACTICAL SCORES
+Awareness: ${scores.awareness||'–'}/10
+Decision Making: ${scores.decision||'–'}/10
+Team Structure: ${scores.structure||'–'}/10
+Game Management: ${scores.gamemanagement||'–'}/10
+Notes: ${state.nt_tactical||'–'}
+
+PSYCHO-SOCIAL SCORES
+Confidence: ${scores.confidence||'–'}/10
+Competitive Spirit: ${scores.competitive||'–'}/10
+Concentration: ${scores.concentration||'–'}/10
+Communication: ${scores.communication||'–'}/10
+Notes: ${state.nt_psychosocial||'–'}
+
+SUMMARY
+Strengths: ${state.sum_strengths||'–'}
+Areas to Improve: ${state.sum_improve||'–'}
+Next Steps: ${state.sum_next||'–'}
+
+FINAL RECOMMENDATION
+${state.rec_main||'–'}
+
+Scout: ${state.rec_scout||'–'}
+Organisation: ${state.rec_org||'–'}
+Date: ${state.rec_date||'–'}
+Signature: ${state.rec_sig||'–'}
+  `.trim();
+
+  try {
+    const res = await fetch('https://formspree.io/f/mbdwlryd', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify({
+        _subject: `PLYRZ Report – ${playerName}`,
+        message: body,
+        player: playerName,
+        scout: state.c_scout||'–',
+        date: state.c_date||'–',
+      })
+    });
+
+    document.body.removeChild(overlay);
+
+    if (res.ok) {
+      // Success screen
+      const success = document.createElement('div');
+      success.className = 'sending-overlay';
+      success.innerHTML = `
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#00e8a2" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+        <p style="font-size:18px;font-weight:700;color:#00e8a2">Report Sent! ✓</p>
+        <p style="font-size:13px;color:#7a9bb5;text-align:center;padding:0 32px">Emailed to Luke@robertmartinroofing.co.uk</p>
+        <button onclick="this.parentElement.remove();document.querySelector('.submit-btn').disabled=false" style="margin-top:16px;padding:12px 28px;background:#00e8a2;color:#0d1b2a;border:none;border-radius:10px;font-family:Outfit,sans-serif;font-size:14px;font-weight:700;cursor:pointer">Done</button>`;
+      document.body.appendChild(success);
+    } else {
+      throw new Error('Failed');
+    }
+  } catch(e) {
+    document.body.removeChild(overlay);
+    btn.disabled = false;
+    const t = document.getElementById('toast');
+    t.style.background = '#ff4f4f';
+    t.textContent = '✗ Failed to send — check connection';
+    t.classList.add('show');
+    setTimeout(()=>{t.classList.remove('show');t.style.background='';},3000);
+  }
 }
 
 buildAttrs();buildDots();bindInputs();
