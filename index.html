@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -21,122 +22,123 @@
 html, body { height: 100%; background: var(--dark); color: var(--text); font-family: 'Outfit', sans-serif; overflow: hidden; }
 
 .topbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px; background: var(--card);
-  border-bottom: 1px solid var(--border);
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+display: flex; align-items: center; justify-content: space-between;
+padding: 14px 16px; background: var(–card);
+border-bottom: 1px solid var(–border);
+position: fixed; top: 0; left: 0; right: 0; z-index: 100;
 }
 .logo { display: flex; align-items: center; gap: 8px; }
 .logo-hex { width: 28px; height: 28px; }
-.logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: var(--mint); }
+.logo-text { font-family: ‘Bebas Neue’, sans-serif; font-size: 20px; letter-spacing: 2px; color: var(–mint); }
 .save-pill {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 11px; font-weight: 600; color: var(--muted);
-  background: var(--card2); border: 1px solid var(--border);
-  border-radius: 20px; padding: 4px 10px; transition: all .3s;
+display: flex; align-items: center; gap: 5px;
+font-size: 11px; font-weight: 600; color: var(–muted);
+background: var(–card2); border: 1px solid var(–border);
+border-radius: 20px; padding: 4px 10px; transition: all .3s;
 }
-.save-pill.saved { color: var(--mint); border-color: var(--border-mint); }
+.save-pill.saved { color: var(–mint); border-color: var(–border-mint); }
 .save-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .pdf-btn {
-  display: flex; align-items: center; gap: 5px;
-  background: var(--mint); color: #0d1b2a;
-  border: none; border-radius: 8px; padding: 8px 12px;
-  font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+display: flex; align-items: center; gap: 5px;
+background: var(–mint); color: #0d1b2a;
+border: none; border-radius: 8px; padding: 8px 12px;
+font-family: ‘Outfit’, sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
 }
 .progress-strip { position: fixed; top: 57px; left: 0; right: 0; z-index: 99; height: 3px; background: rgba(255,255,255,0.06); }
-.progress-fill { height: 100%; background: var(--mint); border-radius: 0 2px 2px 0; transition: width 0.35s ease; }
+.progress-fill { height: 100%; background: var(–mint); border-radius: 0 2px 2px 0; transition: width 0.35s ease; }
 .dot-nav { position: fixed; bottom: 80px; left: 0; right: 0; z-index: 100; display: flex; justify-content: center; gap: 6px; pointer-events: none; }
 .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.2s; }
-.dot.active { background: var(--mint); width: 20px; border-radius: 3px; }
+.dot.active { background: var(–mint); width: 20px; border-radius: 3px; }
 .bottomnav {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  display: flex; background: var(--card); border-top: 1px solid var(--border);
-  padding: 8px 16px; gap: 8px; padding-bottom: max(8px, env(safe-area-inset-bottom));
+position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+display: flex; background: var(–card); border-top: 1px solid var(–border);
+padding: 8px 16px; gap: 8px; padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 .nav-btn {
-  flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
-  background: var(--card2); color: var(--muted);
-  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(–border);
+background: var(–card2); color: var(–muted);
+font-family: ‘Outfit’, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
 }
 .nav-btn:active { transform: scale(0.97); }
-.nav-btn.next { background: var(--mint); color: #0d1b2a; border-color: var(--mint); }
+.nav-btn.next { background: var(–mint); color: #0d1b2a; border-color: var(–mint); }
 .nav-btn:disabled { opacity: 0.3; pointer-events: none; }
 .swipe-container { position: fixed; top: 60px; bottom: 130px; left: 0; right: 0; overflow: hidden; }
 .slides-track { display: flex; height: 100%; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
 .slide { min-width: 100%; height: 100%; overflow-y: auto; padding: 20px 16px 16px; scroll-behavior: smooth; }
 .slide::-webkit-scrollbar { display: none; }
-.sec-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mint); margin-bottom: 4px; }
-.sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 2px; line-height: 1; margin-bottom: 20px; }
+.sec-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(–mint); margin-bottom: 4px; }
+.sec-title { font-family: ‘Bebas Neue’, sans-serif; font-size: 38px; letter-spacing: 2px; line-height: 1; margin-bottom: 20px; }
 .cover-hero {
-  text-align: center; padding: 24px 0 28px;
-  background: linear-gradient(160deg, #0a2540, #0d1b2a);
-  border-radius: 14px; border: 1px solid var(--border); margin-bottom: 24px;
+text-align: center; padding: 24px 0 28px;
+background: linear-gradient(160deg, #0a2540, #0d1b2a);
+border-radius: 14px; border: 1px solid var(–border); margin-bottom: 24px;
 }
 .cover-hex-big { margin-bottom: 16px; }
-.cover-title { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 3px; color: var(--text); line-height: 1; }
-.cover-sub { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--mint); margin-top: 4px; }
+.cover-title { font-family: ‘Bebas Neue’, sans-serif; font-size: 42px; letter-spacing: 3px; color: var(–text); line-height: 1; }
+.cover-sub { font-family: ‘Bebas Neue’, sans-serif; font-size: 24px; letter-spacing: 2px; color: var(–mint); margin-top: 4px; }
 .field-group { display: flex; flex-direction: column; gap: 10px; }
-.field { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; transition: border-color 0.2s; }
-.field:focus-within { border-color: var(--border-mint); }
-.field label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); margin-bottom: 6px; }
-.field input, .field textarea { width: 100%; background: none; border: none; outline: none; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 500; resize: none; }
+.field { background: var(–card); border: 1px solid var(–border); border-radius: 12px; padding: 14px 16px; transition: border-color 0.2s; }
+.field:focus-within { border-color: var(–border-mint); }
+.field label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(–mint); margin-bottom: 6px; }
+.field input, .field textarea { width: 100%; background: none; border: none; outline: none; color: var(–text); font-family: ‘Outfit’, sans-serif; font-size: 16px; font-weight: 500; resize: none; }
 .field input::placeholder, .field textarea::placeholder { color: rgba(122,155,181,0.5); }
 .field textarea { min-height: 80px; line-height: 1.6; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .scale-cards { display: flex; flex-direction: column; gap: 10px; }
-.scale-card { display: flex; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-.scale-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; min-width: 44px; text-align: center; line-height: 1; }
+.scale-card { display: flex; align-items: center; gap: 14px; background: var(–card); border: 1px solid var(–border); border-radius: 12px; padding: 16px; }
+.scale-num { font-family: ‘Bebas Neue’, sans-serif; font-size: 32px; min-width: 44px; text-align: center; line-height: 1; }
 .scale-info { flex: 1; }
 .scale-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-.scale-desc { font-size: 11px; color: var(--muted); }
+.scale-desc { font-size: 11px; color: var(–muted); }
 .scale-mini-bar { width: 40px; height: 4px; border-radius: 99px; }
 .attr-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-.attr-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.attr-card { background: var(–card); border: 1px solid var(–border); border-radius: 12px; padding: 14px 16px; }
 .attr-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .attr-name { font-size: 15px; font-weight: 700; }
-.attr-sub-text { font-size: 11px; color: var(--muted); margin-top: 1px; }
-.stepper { display: flex; align-items: center; background: var(--card2); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
-.step-btn { width: 42px; height: 42px; border: none; background: none; color: var(--mint); font-size: 24px; font-weight: 300; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-.step-btn:active { background: var(--mint-dim); }
-.step-val { min-width: 44px; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--mint); }
+.attr-sub-text { font-size: 11px; color: var(–muted); margin-top: 1px; }
+.stepper { display: flex; align-items: center; background: var(–card2); border-radius: 10px; overflow: hidden; border: 1px solid var(–border); }
+.step-btn { width: 42px; height: 42px; border: none; background: none; color: var(–mint); font-size: 24px; font-weight: 300; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.step-btn:active { background: var(–mint-dim); }
+.step-val { min-width: 44px; text-align: center; font-family: ‘Bebas Neue’, sans-serif; font-size: 24px; color: var(–mint); }
 .attr-bar-row { display: flex; align-items: center; gap: 8px; }
 .attr-bar-bg { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
 .attr-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s, background 0.3s; }
-.attr-bar-label { font-size: 10px; color: var(--muted); min-width: 34px; text-align: right; }
+.attr-bar-label { font-size: 10px; color: var(–muted); min-width: 34px; text-align: right; }
 .cat-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 20px; }
-.cat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
-.cat-score { font-family: 'Bebas Neue', sans-serif; font-size: 36px; display: block; line-height: 1; }
-.cat-label { font-size: 10px; color: var(--muted); margin-top: 4px; }
+.cat-card { background: var(–card); border: 1px solid var(–border); border-radius: 12px; padding: 16px; text-align: center; }
+.cat-score { font-family: ‘Bebas Neue’, sans-serif; font-size: 36px; display: block; line-height: 1; }
+.cat-label { font-size: 10px; color: var(–muted); margin-top: 4px; }
 .radar-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
-.sig-box { background: var(--card); border: 1px solid var(--border-mint); border-radius: 12px; padding: 18px 16px; text-align: center; margin-top: 10px; }
-.sig-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); margin-bottom: 10px; }
-.sig-input { width: 100%; background: none; border: none; outline: none; font-size: 26px; color: var(--text); text-align: center; font-family: 'Outfit', sans-serif; font-style: italic; font-weight: 300; }
-.toast { position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--mint); color: #0d1b2a; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; transition: all 0.3s; z-index: 200; white-space: nowrap; pointer-events: none; }
+.sig-box { background: var(–card); border: 1px solid var(–border-mint); border-radius: 12px; padding: 18px 16px; text-align: center; margin-top: 10px; }
+.sig-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(–mint); margin-bottom: 10px; }
+.sig-input { width: 100%; background: none; border: none; outline: none; font-size: 26px; color: var(–text); text-align: center; font-family: ‘Outfit’, sans-serif; font-style: italic; font-weight: 300; }
+.toast { position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(–mint); color: #0d1b2a; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; transition: all 0.3s; z-index: 200; white-space: nowrap; pointer-events: none; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
 .submit-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  width: 100%; margin-top: 16px; padding: 16px;
-  background: var(--mint); color: #0d1b2a;
-  border: none; border-radius: 12px;
-  font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700;
-  cursor: pointer; transition: opacity .2s;
+display: flex; align-items: center; justify-content: center; gap: 8px;
+width: 100%; margin-top: 16px; padding: 16px;
+background: var(–mint); color: #0d1b2a;
+border: none; border-radius: 12px;
+font-family: ‘Outfit’, sans-serif; font-size: 15px; font-weight: 700;
+cursor: pointer; transition: opacity .2s;
 }
 .submit-btn:active { opacity: .8; }
 .submit-btn:disabled { opacity: .4; pointer-events: none; }
 .sending-overlay {
-  position: fixed; inset: 0; background: rgba(13,27,42,0.92);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 999; gap: 16px;
+position: fixed; inset: 0; background: rgba(13,27,42,0.92);
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+z-index: 999; gap: 16px;
 }
-.sending-overlay p { font-size: 15px; font-weight: 600; color: var(--text); }
+.sending-overlay p { font-size: 15px; font-weight: 600; color: var(–text); }
 .spinner {
-  width: 40px; height: 40px; border: 3px solid rgba(0,232,162,0.2);
-  border-top-color: var(--mint); border-radius: 50%;
-  animation: spin .8s linear infinite;
+width: 40px; height: 40px; border: 3px solid rgba(0,232,162,0.2);
+border-top-color: var(–mint); border-radius: 50%;
+animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
+
 </head>
 <body>
 
@@ -160,115 +162,117 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 <div class="swipe-container" id="swipeContainer">
   <div class="slides-track" id="slidesTrack">
 
-    <!-- SLIDE 1: COVER -->
-    <div class="slide">
-      <div class="cover-hero">
-        <div class="cover-hex-big">
-          <svg width="56" height="64" viewBox="0 0 56 64" fill="none">
-            <path d="M28 2L53 15.5V48.5L28 62L3 48.5V15.5L28 2Z" stroke="#00e8a2" stroke-width="2" fill="rgba(0,232,162,0.06)"/>
-            <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#00e8a2" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="1">PLYRZ</text>
-          </svg>
-        </div>
-        <div class="cover-title">PLAYER</div>
-        <div class="cover-sub">Development Report</div>
-      </div>
-      <div class="field-group">
-        <div class="field"><label>Player Name</label><input type="text" data-key="c_name" placeholder="Enter full name…"></div>
-        <div class="field-row">
-          <div class="field"><label>Age Group</label><input type="text" data-key="c_age" placeholder="e.g. U14"></div>
-          <div class="field"><label>Position</label><input type="text" data-key="c_pos" placeholder="e.g. CAM"></div>
-        </div>
-        <div class="field"><label>Club / Clubs</label><input type="text" data-key="c_club" placeholder="Club name(s)…"></div>
-        <div class="field"><label>Competition Level</label><input type="text" data-key="c_comp" placeholder="e.g. County League"></div>
-        <div class="field-row">
-          <div class="field"><label>Scout Name</label><input type="text" data-key="c_scout" placeholder="Scout…"></div>
-          <div class="field"><label>Date</label><input type="date" data-key="c_date"></div>
-        </div>
-      </div>
+```
+<!-- SLIDE 1: COVER -->
+<div class="slide">
+  <div class="cover-hero">
+    <div class="cover-hex-big">
+      <svg width="56" height="64" viewBox="0 0 56 64" fill="none">
+        <path d="M28 2L53 15.5V48.5L28 62L3 48.5V15.5L28 2Z" stroke="#00e8a2" stroke-width="2" fill="rgba(0,232,162,0.06)"/>
+        <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#00e8a2" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="1">PLYRZ</text>
+      </svg>
     </div>
+    <div class="cover-title">PLAYER</div>
+    <div class="cover-sub">Development Report</div>
+  </div>
+  <div class="field-group">
+    <div class="field"><label>Player Name</label><input type="text" data-key="c_name" placeholder="Enter full name…"></div>
+    <div class="field-row">
+      <div class="field"><label>Age Group</label><input type="text" data-key="c_age" placeholder="e.g. U14"></div>
+      <div class="field"><label>Position</label><input type="text" data-key="c_pos" placeholder="e.g. CAM"></div>
+    </div>
+    <div class="field"><label>Club / Clubs</label><input type="text" data-key="c_club" placeholder="Club name(s)…"></div>
+    <div class="field"><label>Competition Level</label><input type="text" data-key="c_comp" placeholder="e.g. County League"></div>
+    <div class="field-row">
+      <div class="field"><label>Scout Name</label><input type="text" data-key="c_scout" placeholder="Scout…"></div>
+      <div class="field"><label>Date</label><input type="date" data-key="c_date"></div>
+    </div>
+  </div>
+</div>
 
-    <!-- SLIDE 2: SCALE -->
-    <div class="slide">
-      <div class="sec-label">Assessment</div>
-      <div class="sec-title">Scoring Scale</div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px">Players are scored 1–10 against academy players currently in the system. Scores reflect expert judgment based on years of talent identification.</p>
-      <div class="scale-cards">
-        <div class="scale-card"><div class="scale-num" style="color:#7a9bb5">1–3</div><div class="scale-info"><div class="scale-name">Lower–Mid Grassroots</div><div class="scale-desc">Developing foundational skills</div></div><div class="scale-mini-bar" style="background:#7a9bb5"></div></div>
-        <div class="scale-card"><div class="scale-num" style="color:#ffc93c">4–6</div><div class="scale-info"><div class="scale-name">Mid–High Grassroots</div><div class="scale-desc">Competent, consistent ability</div></div><div class="scale-mini-bar" style="background:#ffc93c"></div></div>
-        <div class="scale-card"><div class="scale-num" style="color:#4fc8ff">7–8</div><div class="scale-info"><div class="scale-name">Mid–High Academy</div><div class="scale-desc">Academy-grade qualities</div></div><div class="scale-mini-bar" style="background:#4fc8ff"></div></div>
-        <div class="scale-card"><div class="scale-num" style="color:var(--mint)">9–10</div><div class="scale-info"><div class="scale-name">Elite Academy Level</div><div class="scale-desc">Exceptional talent at the highest level</div></div><div class="scale-mini-bar" style="background:var(--mint)"></div></div>
-      </div>
-    </div>
+<!-- SLIDE 2: SCALE -->
+<div class="slide">
+  <div class="sec-label">Assessment</div>
+  <div class="sec-title">Scoring Scale</div>
+  <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px">Players are scored 1–10 against academy players currently in the system. Scores reflect expert judgment based on years of talent identification.</p>
+  <div class="scale-cards">
+    <div class="scale-card"><div class="scale-num" style="color:#7a9bb5">1–3</div><div class="scale-info"><div class="scale-name">Lower–Mid Grassroots</div><div class="scale-desc">Developing foundational skills</div></div><div class="scale-mini-bar" style="background:#7a9bb5"></div></div>
+    <div class="scale-card"><div class="scale-num" style="color:#ffc93c">4–6</div><div class="scale-info"><div class="scale-name">Mid–High Grassroots</div><div class="scale-desc">Competent, consistent ability</div></div><div class="scale-mini-bar" style="background:#ffc93c"></div></div>
+    <div class="scale-card"><div class="scale-num" style="color:#4fc8ff">7–8</div><div class="scale-info"><div class="scale-name">Mid–High Academy</div><div class="scale-desc">Academy-grade qualities</div></div><div class="scale-mini-bar" style="background:#4fc8ff"></div></div>
+    <div class="scale-card"><div class="scale-num" style="color:var(--mint)">9–10</div><div class="scale-info"><div class="scale-name">Elite Academy Level</div><div class="scale-desc">Exceptional talent at the highest level</div></div><div class="scale-mini-bar" style="background:var(--mint)"></div></div>
+  </div>
+</div>
 
-    <!-- SLIDE 3: TECHNICAL -->
-    <div class="slide">
-      <div class="sec-label">Category 01</div>
-      <div class="sec-title">Technical</div>
-      <div class="attr-list" id="attrs-technical"></div>
-      <div class="field"><label>Technical Observations</label><textarea data-key="nt_technical" placeholder="Describe the player's technical strengths…"></textarea></div>
-    </div>
+<!-- SLIDE 3: TECHNICAL -->
+<div class="slide">
+  <div class="sec-label">Category 01</div>
+  <div class="sec-title">Technical</div>
+  <div class="attr-list" id="attrs-technical"></div>
+  <div class="field"><label>Technical Observations</label><textarea data-key="nt_technical" placeholder="Describe the player's technical strengths…"></textarea></div>
+</div>
 
-    <!-- SLIDE 4: PHYSICAL -->
-    <div class="slide">
-      <div class="sec-label">Category 02</div>
-      <div class="sec-title">Physical</div>
-      <div class="attr-list" id="attrs-physical"></div>
-      <div class="field"><label>Physical Observations</label><textarea data-key="nt_physical" placeholder="Describe the player's physical profile…"></textarea></div>
-    </div>
+<!-- SLIDE 4: PHYSICAL -->
+<div class="slide">
+  <div class="sec-label">Category 02</div>
+  <div class="sec-title">Physical</div>
+  <div class="attr-list" id="attrs-physical"></div>
+  <div class="field"><label>Physical Observations</label><textarea data-key="nt_physical" placeholder="Describe the player's physical profile…"></textarea></div>
+</div>
 
-    <!-- SLIDE 5: TACTICAL -->
-    <div class="slide">
-      <div class="sec-label">Category 03</div>
-      <div class="sec-title">Tactical</div>
-      <div class="attr-list" id="attrs-tactical"></div>
-      <div class="field"><label>Tactical Observations</label><textarea data-key="nt_tactical" placeholder="Describe the player's tactical intelligence…"></textarea></div>
-    </div>
+<!-- SLIDE 5: TACTICAL -->
+<div class="slide">
+  <div class="sec-label">Category 03</div>
+  <div class="sec-title">Tactical</div>
+  <div class="attr-list" id="attrs-tactical"></div>
+  <div class="field"><label>Tactical Observations</label><textarea data-key="nt_tactical" placeholder="Describe the player's tactical intelligence…"></textarea></div>
+</div>
 
-    <!-- SLIDE 6: PSYCHO-SOCIAL -->
-    <div class="slide">
-      <div class="sec-label">Category 04</div>
-      <div class="sec-title">Psycho-Social</div>
-      <div class="attr-list" id="attrs-psychosocial"></div>
-      <div class="field"><label>Psycho-Social Observations</label><textarea data-key="nt_psychosocial" placeholder="Describe the player's mental and social qualities…"></textarea></div>
-    </div>
+<!-- SLIDE 6: PSYCHO-SOCIAL -->
+<div class="slide">
+  <div class="sec-label">Category 04</div>
+  <div class="sec-title">Psycho-Social</div>
+  <div class="attr-list" id="attrs-psychosocial"></div>
+  <div class="field"><label>Psycho-Social Observations</label><textarea data-key="nt_psychosocial" placeholder="Describe the player's mental and social qualities…"></textarea></div>
+</div>
 
-    <!-- SLIDE 7: SUMMARY -->
-    <div class="slide">
-      <div class="sec-label">Overview</div>
-      <div class="sec-title">Summary</div>
-      <div class="cat-row" id="catRow"></div>
-      <div class="radar-wrap"><canvas id="radarCanvas" width="280" height="280"></canvas></div>
-      <div class="field-group">
-        <div class="field"><label>Strengths</label><textarea data-key="sum_strengths" placeholder="Player demonstrates high levels of…"></textarea></div>
-        <div class="field"><label>Areas to Improve</label><textarea data-key="sum_improve" placeholder="Player could improve by…"></textarea></div>
-        <div class="field"><label>Next Steps</label><textarea data-key="sum_next" placeholder="Recommended next steps…"></textarea></div>
-      </div>
-    </div>
+<!-- SLIDE 7: SUMMARY -->
+<div class="slide">
+  <div class="sec-label">Overview</div>
+  <div class="sec-title">Summary</div>
+  <div class="cat-row" id="catRow"></div>
+  <div class="radar-wrap"><canvas id="radarCanvas" width="280" height="280"></canvas></div>
+  <div class="field-group">
+    <div class="field"><label>Strengths</label><textarea data-key="sum_strengths" placeholder="Player demonstrates high levels of…"></textarea></div>
+    <div class="field"><label>Areas to Improve</label><textarea data-key="sum_improve" placeholder="Player could improve by…"></textarea></div>
+    <div class="field"><label>Next Steps</label><textarea data-key="sum_next" placeholder="Recommended next steps…"></textarea></div>
+  </div>
+</div>
 
-    <!-- SLIDE 8: FINAL -->
-    <div class="slide">
-      <div class="sec-label">Final Assessment</div>
-      <div class="sec-title">Recommendations</div>
-      <div class="field-group">
-        <div class="field"><label>Scout Recommendation</label><textarea data-key="rec_main" placeholder="Overall recommendation…"></textarea></div>
-        <div class="field-row">
-          <div class="field"><label>Scout Name</label><input type="text" data-key="rec_scout" placeholder="Full name"></div>
-          <div class="field"><label>Organisation</label><input type="text" data-key="rec_org" placeholder="Org & level"></div>
-        </div>
-        <div class="field-row">
-          <div class="field"><label>Date</label><input type="date" data-key="rec_date"></div>
-          <div class="field"><label>Assessed Level</label><input type="text" data-key="rec_level" placeholder="League / cup"></div>
-        </div>
-        <div class="sig-box">
-          <div class="sig-label">Signature</div>
-          <input type="text" class="sig-input" data-key="rec_sig" placeholder="Sign here…">
-        </div>
-        <button class="submit-btn" onclick="submitReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Submit Report
-        </button>
-      </div>
+<!-- SLIDE 8: FINAL -->
+<div class="slide">
+  <div class="sec-label">Final Assessment</div>
+  <div class="sec-title">Recommendations</div>
+  <div class="field-group">
+    <div class="field"><label>Scout Recommendation</label><textarea data-key="rec_main" placeholder="Overall recommendation…"></textarea></div>
+    <div class="field-row">
+      <div class="field"><label>Scout Name</label><input type="text" data-key="rec_scout" placeholder="Full name"></div>
+      <div class="field"><label>Organisation</label><input type="text" data-key="rec_org" placeholder="Org & level"></div>
     </div>
+    <div class="field-row">
+      <div class="field"><label>Date</label><input type="date" data-key="rec_date"></div>
+      <div class="field"><label>Assessed Level</label><input type="text" data-key="rec_level" placeholder="League / cup"></div>
+    </div>
+    <div class="sig-box">
+      <div class="sig-label">Signature</div>
+      <input type="text" class="sig-input" data-key="rec_sig" placeholder="Sign here…">
+    </div>
+    <button class="submit-btn" onclick="submitReport()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Submit Report
+    </button>
+  </div>
+</div>
+```
 
   </div>
 </div>
@@ -645,21 +649,28 @@ async function submitReport(){
 </body></html>`;
 
   try {
-    const res = await fetch('https://formspree.io/f/mbdwlryd', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-      body: JSON.stringify({
-        _subject: `PLYRZ Report – ${playerName}`,
-        _html: body,
-        player: playerName,
-        scout: state.c_scout||'–',
-        date: state.c_date||'–',
-      })
+    // Load EmailJS SDK
+    if (!window.emailjs) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
+      emailjs.init('uqFBj3E0R8fcCdh8c');
+    }
+
+    const res = await emailjs.send('service_br5x48g', 'template_lqbnu9b', {
+      player_name: playerName,
+      html_content: body,
+      to_email: 'luke@robertmartinroofing.co.uk',
+      subject: `PLYRZ Report – ${playerName}`,
     });
+    const ok = res.status === 200;
 
     document.body.removeChild(overlay);
 
-    if (res.ok) {
+    if (ok) {
       // Success screen
       const success = document.createElement('div');
       success.className = 'sending-overlay';
@@ -703,5 +714,6 @@ if(Object.keys(state).length>2){
   .cover-sub,.sec-label,.field label,.sig-label{color:#112240!important}
 }
 </style>
+
 </body>
 </html>
