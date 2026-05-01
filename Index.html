@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PLYRZ – Player Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mint: #00e8a2;
+  --mint-dim: rgba(0,232,162,0.1);
+  --dark: #0d1b2a;
+  --card: #112240;
+  --card2: #1a3a5c;
+  --border: rgba(255,255,255,0.09);
+  --border-mint: rgba(0,232,162,0.22);
+  --text: #e4ede8;
+  --muted: #7a9bb5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--dark); color: var(--text); font-family: 'Outfit', sans-serif; overflow: hidden; }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 8px; }
+.logo-hex { width: 28px; height: 28px; }
+.logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: var(--mint); }
+.save-pill {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 10px; transition: all .3s;
+}
+.save-pill.saved { color: var(--mint); border-color: var(--border-mint); }
+.save-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pdf-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--mint); color: #0d1b2a;
+  border: none; border-radius: 8px; padding: 8px 12px;
+  font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.progress-strip { position: fixed; top: 57px; left: 0; right: 0; z-index: 99; height: 3px; background: rgba(255,255,255,0.06); }
+.progress-fill { height: 100%; background: var(--mint); border-radius: 0 2px 2px 0; transition: width 0.35s ease; }
+.dot-nav { position: fixed; bottom: 80px; left: 0; right: 0; z-index: 100; display: flex; justify-content: center; gap: 6px; pointer-events: none; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.2s; }
+.dot.active { background: var(--mint); width: 20px; border-radius: 3px; }
+.bottomnav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  display: flex; background: var(--card); border-top: 1px solid var(--border);
+  padding: 8px 16px; gap: 8px; padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+.nav-btn {
+  flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--card2); color: var(--muted);
+  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+}
+.nav-btn:active { transform: scale(0.97); }
+.nav-btn.next { background: var(--mint); color: #0d1b2a; border-color: var(--mint); }
+.nav-btn:disabled { opacity: 0.3; pointer-events: none; }
+.swipe-container { position: fixed; top: 60px; bottom: 130px; left: 0; right: 0; overflow: hidden; }
+.slides-track { display: flex; height: 100%; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+.slide { min-width: 100%; height: 100%; overflow-y: auto; padding: 20px 16px 16px; scroll-behavior: smooth; }
+.slide::-webkit-scrollbar { display: none; }
+.sec-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--mint); margin-bottom: 4px; }
+.sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 2px; line-height: 1; margin-bottom: 20px; }
+.cover-hero {
+  text-align: center; padding: 24px 0 28px;
+  background: linear-gradient(160deg, #0a2540, #0d1b2a);
+  border-radius: 14px; border: 1px solid var(--border); margin-bottom: 24px;
+}
+.cover-hex-big { margin-bottom: 16px; }
+.cover-title { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 3px; color: var(--text); line-height: 1; }
+.cover-sub { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--mint); margin-top: 4px; }
+.field-group { display: flex; flex-direction: column; gap: 10px; }
+.field { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; transition: border-color 0.2s; }
+.field:focus-within { border-color: var(--border-mint); }
+.field label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); margin-bottom: 6px; }
+.field input, .field textarea { width: 100%; background: none; border: none; outline: none; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 500; resize: none; }
+.field input::placeholder, .field textarea::placeholder { color: rgba(122,155,181,0.5); }
+.field textarea { min-height: 80px; line-height: 1.6; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.scale-cards { display: flex; flex-direction: column; gap: 10px; }
+.scale-card { display: flex; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.scale-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; min-width: 44px; text-align: center; line-height: 1; }
+.scale-info { flex: 1; }
+.scale-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.scale-desc { font-size: 11px; color: var(--muted); }
+.scale-mini-bar { width: 40px; height: 4px; border-radius: 99px; }
+.attr-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.attr-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.attr-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.attr-name { font-size: 15px; font-weight: 700; }
+.attr-sub-text { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.stepper { display: flex; align-items: center; background: var(--card2); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+.step-btn { width: 42px; height: 42px; border: none; background: none; color: var(--mint); font-size: 24px; font-weight: 300; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.step-btn:active { background: var(--mint-dim); }
+.step-val { min-width: 44px; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--mint); }
+.attr-bar-row { display: flex; align-items: center; gap: 8px; }
+.attr-bar-bg { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
+.attr-bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s, background 0.3s; }
+.attr-bar-label { font-size: 10px; color: var(--muted); min-width: 34px; text-align: right; }
+.cat-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 20px; }
+.cat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+.cat-score { font-family: 'Bebas Neue', sans-serif; font-size: 36px; display: block; line-height: 1; }
+.cat-label { font-size: 10px; color: var(--muted); margin-top: 4px; }
+.radar-wrap { display: flex; justify-content: center; margin-bottom: 20px; }
+.sig-box { background: var(--card); border: 1px solid var(--border-mint); border-radius: 12px; padding: 18px 16px; text-align: center; margin-top: 10px; }
+.sig-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); margin-bottom: 10px; }
+.sig-input { width: 100%; background: none; border: none; outline: none; font-size: 26px; color: var(--text); text-align: center; font-family: 'Outfit', sans-serif; font-style: italic; font-weight: 300; }
+.toast { position: fixed; bottom: 140px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--mint); color: #0d1b2a; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; opacity: 0; transition: all 0.3s; z-index: 200; white-space: nowrap; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <svg class="logo-hex" viewBox="0 0 28 32" fill="none">
+      <path d="M14 1L26 7.5V24.5L14 31L2 24.5V7.5L14 1Z" stroke="#00e8a2" stroke-width="1.5" fill="rgba(0,232,162,0.08)"/>
+      <text x="50%" y="57%" dominant-baseline="middle" text-anchor="middle" fill="#00e8a2" font-family="Bebas Neue,sans-serif" font-size="7" letter-spacing="0.5">PLYRZ</text>
+    </svg>
+    <span class="logo-text">PLYRZ</span>
+  </div>
+  <div class="save-pill" id="savePill"><div class="save-dot"></div><span id="saveLabel">Auto-save</span></div>
+  <button class="pdf-btn" onclick="window.print()">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    PDF
+  </button>
+</div>
+
+<div class="progress-strip"><div class="progress-fill" id="progressFill" style="width:12.5%"></div></div>
+
+<div class="swipe-container" id="swipeContainer">
+  <div class="slides-track" id="slidesTrack">
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide">
+      <div class="cover-hero">
+        <div class="cover-hex-big">
+          <svg width="56" height="64" viewBox="0 0 56 64" fill="none">
+            <path d="M28 2L53 15.5V48.5L28 62L3 48.5V15.5L28 2Z" stroke="#00e8a2" stroke-width="2" fill="rgba(0,232,162,0.06)"/>
+            <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#00e8a2" font-family="Bebas Neue,sans-serif" font-size="13" letter-spacing="1">PLYRZ</text>
+          </svg>
+        </div>
+        <div class="cover-title">PLAYER</div>
+        <div class="cover-sub">Development Report</div>
+      </div>
+      <div class="field-group">
+        <div class="field"><label>Player Name</label><input type="text" data-key="c_name" placeholder="Enter full name…"></div>
+        <div class="field-row">
+          <div class="field"><label>Age Group</label><input type="text" data-key="c_age" placeholder="e.g. U14"></div>
+          <div class="field"><label>Position</label><input type="text" data-key="c_pos" placeholder="e.g. CAM"></div>
+        </div>
+        <div class="field"><label>Club / Clubs</label><input type="text" data-key="c_club" placeholder="Club name(s)…"></div>
+        <div class="field"><label>Competition Level</label><input type="text" data-key="c_comp" placeholder="e.g. County League"></div>
+        <div class="field-row">
+          <div class="field"><label>Scout Name</label><input type="text" data-key="c_scout" placeholder="Scout…"></div>
+          <div class="field"><label>Date</label><input type="date" data-key="c_date"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: SCALE -->
+    <div class="slide">
+      <div class="sec-label">Assessment</div>
+      <div class="sec-title">Scoring Scale</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px">Players are scored 1–10 against academy players currently in the system. Scores reflect expert judgment based on years of talent identification.</p>
+      <div class="scale-cards">
+        <div class="scale-card"><div class="scale-num" style="color:#7a9bb5">1–3</div><div class="scale-info"><div class="scale-name">Lower–Mid Grassroots</div><div class="scale-desc">Developing foundational skills</div></div><div class="scale-mini-bar" style="background:#7a9bb5"></div></div>
+        <div class="scale-card"><div class="scale-num" style="color:#ffc93c">4–6</div><div class="scale-info"><div class="scale-name">Mid–High Grassroots</div><div class="scale-desc">Competent, consistent ability</div></div><div class="scale-mini-bar" style="background:#ffc93c"></div></div>
+        <div class="scale-card"><div class="scale-num" style="color:#4fc8ff">7–8</div><div class="scale-info"><div class="scale-name">Mid–High Academy</div><div class="scale-desc">Academy-grade qualities</div></div><div class="scale-mini-bar" style="background:#4fc8ff"></div></div>
+        <div class="scale-card"><div class="scale-num" style="color:var(--mint)">9–10</div><div class="scale-info"><div class="scale-name">Elite Academy Level</div><div class="scale-desc">Exceptional talent at the highest level</div></div><div class="scale-mini-bar" style="background:var(--mint)"></div></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: TECHNICAL -->
+    <div class="slide">
+      <div class="sec-label">Category 01</div>
+      <div class="sec-title">Technical</div>
+      <div class="attr-list" id="attrs-technical"></div>
+      <div class="field"><label>Technical Observations</label><textarea data-key="nt_technical" placeholder="Describe the player's technical strengths…"></textarea></div>
+    </div>
+
+    <!-- SLIDE 4: PHYSICAL -->
+    <div class="slide">
+      <div class="sec-label">Category 02</div>
+      <div class="sec-title">Physical</div>
+      <div class="attr-list" id="attrs-physical"></div>
+      <div class="field"><label>Physical Observations</label><textarea data-key="nt_physical" placeholder="Describe the player's physical profile…"></textarea></div>
+    </div>
+
+    <!-- SLIDE 5: TACTICAL -->
+    <div class="slide">
+      <div class="sec-label">Category 03</div>
+      <div class="sec-title">Tactical</div>
+      <div class="attr-list" id="attrs-tactical"></div>
+      <div class="field"><label>Tactical Observations</label><textarea data-key="nt_tactical" placeholder="Describe the player's tactical intelligence…"></textarea></div>
+    </div>
+
+    <!-- SLIDE 6: PSYCHO-SOCIAL -->
+    <div class="slide">
+      <div class="sec-label">Category 04</div>
+      <div class="sec-title">Psycho-Social</div>
+      <div class="attr-list" id="attrs-psychosocial"></div>
+      <div class="field"><label>Psycho-Social Observations</label><textarea data-key="nt_psychosocial" placeholder="Describe the player's mental and social qualities…"></textarea></div>
+    </div>
+
+    <!-- SLIDE 7: SUMMARY -->
+    <div class="slide">
+      <div class="sec-label">Overview</div>
+      <div class="sec-title">Summary</div>
+      <div class="cat-row" id="catRow"></div>
+      <div class="radar-wrap"><canvas id="radarCanvas" width="280" height="280"></canvas></div>
+      <div class="field-group">
+        <div class="field"><label>Strengths</label><textarea data-key="sum_strengths" placeholder="Player demonstrates high levels of…"></textarea></div>
+        <div class="field"><label>Areas to Improve</label><textarea data-key="sum_improve" placeholder="Player could improve by…"></textarea></div>
+        <div class="field"><label>Next Steps</label><textarea data-key="sum_next" placeholder="Recommended next steps…"></textarea></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: FINAL -->
+    <div class="slide">
+      <div class="sec-label">Final Assessment</div>
+      <div class="sec-title">Recommendations</div>
+      <div class="field-group">
+        <div class="field"><label>Scout Recommendation</label><textarea data-key="rec_main" placeholder="Overall recommendation…"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label>Scout Name</label><input type="text" data-key="rec_scout" placeholder="Full name"></div>
+          <div class="field"><label>Organisation</label><input type="text" data-key="rec_org" placeholder="Org & level"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Date</label><input type="date" data-key="rec_date"></div>
+          <div class="field"><label>Assessed Level</label><input type="text" data-key="rec_level" placeholder="League / cup"></div>
+        </div>
+        <div class="sig-box">
+          <div class="sig-label">Signature</div>
+          <input type="text" class="sig-input" data-key="rec_sig" placeholder="Sign here…">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="dot-nav" id="dotNav"></div>
+<div class="bottomnav">
+  <button class="nav-btn" id="prevBtn" onclick="goTo(currentSlide-1)" disabled>← Back</button>
+  <button class="nav-btn next" id="nextBtn" onclick="goTo(currentSlide+1)">Next →</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STORE_KEY = 'plyrz_navy_v1';
+const ATTRS = {
+  technical:[
+    {id:'dribbling',name:'Dribbling',sub:'Ball control & 1v1 ability'},
+    {id:'shooting',name:'Shooting',sub:'Finishing & shot technique'},
+    {id:'passing',name:'Passing',sub:'Range, weight & accuracy'},
+    {id:'receiving',name:'Receiving',sub:'First touch & body shape'},
+  ],
+  physical:[
+    {id:'agility',name:'Agility',sub:'Change of direction & quickness'},
+    {id:'balance',name:'Balance',sub:'Stability under pressure'},
+    {id:'speed',name:'Speed',sub:'Pace with & without ball'},
+    {id:'strength',name:'Strength',sub:'Physical duels & hold-up play'},
+  ],
+  tactical:[
+    {id:'awareness',name:'Awareness',sub:'Scanning & spatial recognition'},
+    {id:'decision',name:'Decision Making',sub:'Speed & quality of choices'},
+    {id:'structure',name:'Team Structure',sub:'Positional understanding'},
+    {id:'gamemanagement',name:'Game Management',sub:'Reading & influencing the game'},
+  ],
+  psychosocial:[
+    {id:'confidence',name:'Confidence',sub:'Self-belief in key moments'},
+    {id:'competitive',name:'Competitive Spirit',sub:'Drive to win & determination'},
+    {id:'concentration',name:'Concentration',sub:'Focus over 90 minutes'},
+    {id:'communication',name:'Communication',sub:'Leadership & vocal presence'},
+  ],
+};
+const CATEGORIES=[
+  {label:'Technical',keys:['dribbling','shooting','passing','receiving']},
+  {label:'Physical',keys:['agility','balance','speed','strength']},
+  {label:'Tactical',keys:['awareness','decision','structure','gamemanagement']},
+  {label:'Psycho-Soc',keys:['confidence','competitive','concentration','communication']},
+];
+
+let state={};
+try{state=JSON.parse(localStorage.getItem(STORE_KEY))||{};}catch(e){state={};}
+const scores={};
+let saveTimer;
+
+function debouncedSave(){
+  clearTimeout(saveTimer);
+  document.getElementById('saveLabel').textContent='Saving…';
+  saveTimer=setTimeout(()=>{
+    try{localStorage.setItem(STORE_KEY,JSON.stringify({...state,scores}));}catch(e){}
+    const pill=document.getElementById('savePill');
+    pill.classList.add('saved');
+    document.getElementById('saveLabel').textContent='Saved ✓';
+    setTimeout(()=>{pill.classList.remove('saved');document.getElementById('saveLabel').textContent='Auto-save';},2000);
+  },700);
+}
+
+function scoreColor(v){
+  if(!v)return'var(--muted)';
+  if(v<=3)return'#7a9bb5';
+  if(v<=6)return'#ffc93c';
+  if(v<=8)return'#4fc8ff';
+  return'#00e8a2';
+}
+
+function buildAttrs(){
+  Object.entries(ATTRS).forEach(([cat,attrs])=>{
+    const container=document.getElementById('attrs-'+cat);
+    if(!container)return;
+    attrs.forEach(attr=>{
+      const saved=(state.scores&&state.scores[attr.id])||0;
+      scores[attr.id]=saved;
+      const col=scoreColor(saved);
+      const card=document.createElement('div');
+      card.className='attr-card';
+      card.innerHTML=`
+        <div class="attr-top">
+          <div><div class="attr-name">${attr.name}</div><div class="attr-sub-text">${attr.sub}</div></div>
+          <div class="stepper">
+            <button class="step-btn" onclick="stepScore('${attr.id}',-1)">−</button>
+            <div class="step-val" id="sv-${attr.id}" style="color:${col}">${saved||'–'}</div>
+            <button class="step-btn" onclick="stepScore('${attr.id}',1)">+</button>
+          </div>
+        </div>
+        <div class="attr-bar-row">
+          <div class="attr-bar-bg"><div class="attr-bar-fill" id="bf-${attr.id}" style="width:${saved*10}%;background:${col}"></div></div>
+          <span class="attr-bar-label" id="bl-${attr.id}">${saved?saved+'/10':'–/10'}</span>
+        </div>`;
+      container.appendChild(card);
+    });
+  });
+}
+
+function stepScore(id,delta){
+  const next=Math.max(1,Math.min(10,(scores[id]||0)+delta));
+  scores[id]=next;
+  const col=scoreColor(next);
+  document.getElementById('bf-'+id).style.width=(next*10)+'%';
+  document.getElementById('bf-'+id).style.background=col;
+  document.getElementById('bl-'+id).textContent=next+'/10';
+  document.getElementById('sv-'+id).textContent=next;
+  document.getElementById('sv-'+id).style.color=col;
+  debouncedSave();
+}
+
+function bindInputs(){
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const key=el.dataset.key;
+    if(state[key])el.value=state[key];
+    el.addEventListener('input',()=>{state[key]=el.value;debouncedSave();});
+  });
+}
+
+const TOTAL_SLIDES=8;
+let currentSlide=0;
+
+function buildDots(){
+  const nav=document.getElementById('dotNav');
+  for(let i=0;i<TOTAL_SLIDES;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i===0?' active':'');
+    d.onclick=()=>goTo(i);
+    d.style.pointerEvents='all';
+    nav.appendChild(d);
+  }
+}
+
+function goTo(idx){
+  idx=Math.max(0,Math.min(TOTAL_SLIDES-1,idx));
+  currentSlide=idx;
+  document.getElementById('slidesTrack').style.transform=`translateX(-${idx*100}%)`;
+  document.getElementById('progressFill').style.width=`${((idx+1)/TOTAL_SLIDES)*100}%`;
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  document.getElementById('prevBtn').disabled=idx===0;
+  document.getElementById('nextBtn').disabled=idx===TOTAL_SLIDES-1;
+  document.getElementById('nextBtn').textContent=idx===TOTAL_SLIDES-2?'Finish →':'Next →';
+  if(idx===6){renderRadar();renderCatAvg();}
+}
+
+const swipeEl=document.getElementById('swipeContainer');
+let touchStartX=0,touchStartY=0,swiping=false;
+swipeEl.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;swiping=false;},{passive:true});
+swipeEl.addEventListener('touchmove',e=>{
+  const dx=e.touches[0].clientX-touchStartX,dy=e.touches[0].clientY-touchStartY;
+  if(!swiping&&Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>8)swiping=true;
+  if(swiping)e.preventDefault();
+},{passive:false});
+swipeEl.addEventListener('touchend',e=>{
+  if(!swiping)return;
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)>50)dx<0?goTo(currentSlide+1):goTo(currentSlide-1);
+});
+
+function renderRadar(){
+  const canvas=document.getElementById('radarCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,r=96;
+  ctx.clearRect(0,0,W,H);
+  const n=CATEGORIES.length,step=(Math.PI*2)/n;
+  const catScores=CATEGORIES.map(cat=>{
+    const s=cat.keys.map(k=>scores[k]||0).filter(v=>v>0);
+    return s.length?s.reduce((a,b)=>a+b,0)/s.length:0;
+  });
+  for(let i=1;i<=5;i++){
+    ctx.beginPath();
+    for(let j=0;j<n;j++){const a=step*j-Math.PI/2;j===0?ctx.moveTo(cx+Math.cos(a)*r*i/5,cy+Math.sin(a)*r*i/5):ctx.lineTo(cx+Math.cos(a)*r*i/5,cy+Math.sin(a)*r*i/5);}
+    ctx.closePath();ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1;ctx.stroke();
+  }
+  for(let j=0;j<n;j++){const a=step*j-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.stroke();}
+  ctx.beginPath();
+  for(let j=0;j<n;j++){const a=step*j-Math.PI/2,v=Math.min(catScores[j]/10,1);j===0?ctx.moveTo(cx+Math.cos(a)*r*v,cy+Math.sin(a)*r*v):ctx.lineTo(cx+Math.cos(a)*r*v,cy+Math.sin(a)*r*v);}
+  ctx.closePath();ctx.fillStyle='rgba(0,232,162,0.15)';ctx.fill();ctx.strokeStyle='#00e8a2';ctx.lineWidth=2;ctx.stroke();
+  ctx.font='600 11px Outfit,sans-serif';ctx.textAlign='center';
+  for(let j=0;j<n;j++){
+    const a=step*j-Math.PI/2,v=Math.min(catScores[j]/10,1);
+    ctx.beginPath();ctx.arc(cx+Math.cos(a)*r*v,cy+Math.sin(a)*r*v,4,0,Math.PI*2);ctx.fillStyle='#00e8a2';ctx.fill();
+    ctx.fillStyle='#e4ede8';ctx.fillText(CATEGORIES[j].label,cx+Math.cos(a)*(r+20),cy+Math.sin(a)*(r+20)+4);
+  }
+}
+
+function renderCatAvg(){
+  const row=document.getElementById('catRow');
+  if(!row)return;
+  row.innerHTML=CATEGORIES.map(cat=>{
+    const s=cat.keys.map(k=>scores[k]||0).filter(v=>v>0);
+    const avg=s.length?(s.reduce((a,b)=>a+b,0)/s.length).toFixed(1):'–';
+    const col=avg==='–'?'var(--muted)':scoreColor(+avg);
+    return`<div class="cat-card"><span class="cat-score" style="color:${col}">${avg}</span><div class="cat-label">${cat.label}</div></div>`;
+  }).join('');
+}
+
+buildAttrs();buildDots();bindInputs();
+if(!state.c_date){const d=document.querySelector('[data-key="c_date"]');if(d){d.valueAsDate=new Date();state.c_date=d.value;}}
+if(!state.rec_date){const d=document.querySelector('[data-key="rec_date"]');if(d){d.valueAsDate=new Date();state.rec_date=d.value;}}
+if(Object.keys(state).length>2){
+  setTimeout(()=>{const t=document.getElementById('toast');t.textContent='✓ Report loaded from last session';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);},600);
+}
+</script>
+
+<style>
+@media print {
+  .topbar,.progress-strip,.dot-nav,.bottomnav,.toast{display:none!important}
+  .swipe-container{position:static;overflow:visible}
+  .slides-track{display:block;transform:none!important}
+  .slide{min-width:100%;display:block;overflow:visible;page-break-after:always;background:white;color:#111;padding:24px}
+  .field,.attr-card,.scale-card,.cat-card,.sig-box,.cover-hero{border-color:#ddd!important;background:#f0f4f8!important}
+  .field input,.field textarea,.attr-name,.scale-name{color:#111!important}
+  .sec-title,.cover-title{color:#0d1b2a!important;font-size:28px}
+  .cover-sub,.sec-label,.field label,.sig-label{color:#112240!important}
+}
+</style>
+</body>
+</html>
