@@ -584,11 +584,14 @@ function submitReport(){
   <!-- CATEGORY AVERAGES -->
   <div style="margin-bottom:28px">
     <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:12px">Category Averages</div>
-    <div style="display:flex;gap:12px">
+    <div style="display:flex;gap:12px;margin-bottom:20px">
       ${avgCard('Technical',techAvg)}
       ${avgCard('Physical',physAvg)}
       ${avgCard('Tactical',tactAvg)}
       ${avgCard('Psycho-Soc',psychAvg)}
+    </div>
+    <div style="background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;display:flex;justify-content:center">
+      <canvas id="pdfRadar" width="300" height="300"></canvas>
     </div>
   </div>
 
