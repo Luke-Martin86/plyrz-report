@@ -264,8 +264,8 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
           <input type="text" class="sig-input" data-key="rec_sig" placeholder="Sign here…">
         </div>
         <button class="submit-btn" onclick="submitReport()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Submit Report
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Generate Report
         </button>
       </div>
     </div>
@@ -467,170 +467,186 @@ function renderCatAvg(){
   }).join('');
 }
 
-async function submitReport(){
-  const btn = document.querySelector('.submit-btn');
-  btn.disabled = true;
-
-  // Show sending overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'sending-overlay';
-  overlay.innerHTML = '<div class="spinner"></div><p>Sending report…</p>';
-  document.body.appendChild(overlay);
-
+function submitReport(){
   const playerName = state.c_name || 'Unknown Player';
 
-  function bar(v) {
-    const filled = Math.round((v||0));
-    return '█'.repeat(filled) + '░'.repeat(10 - filled) + '  ' + (v||'–') + '/10';
+  function avg(keys){
+    const s=keys.map(k=>scores[k]||0).filter(v=>v>0);
+    return s.length?(s.reduce((a,b)=>a+b,0)/s.length).toFixed(1):'–';
+  }
+  function scoreCol(v){
+    if(!v||v===0)return'#4a6580';
+    if(v<=3)return'#7a9bb5';
+    if(v<=6)return'#ffc93c';
+    if(v<=8)return'#4fc8ff';
+    return'#00e8a2';
   }
 
-  function avg(keys) {
-    const s = keys.map(k => scores[k]||0).filter(v => v > 0);
-    return s.length ? (s.reduce((a,b)=>a+b,0)/s.length).toFixed(1) : '–';
+  // Build full branded HTML report in a new window
+  const techAvg=avg(['dribbling','shooting','passing','receiving']);
+  const physAvg=avg(['agility','balance','speed','strength']);
+  const tactAvg=avg(['awareness','decision','structure','gamemanagement']);
+  const psychAvg=avg(['confidence','competitive','concentration','communication']);
+
+  function scoreRow(label,id){
+    const v=scores[id]||0;
+    const col=scoreCol(v);
+    const pct=v*10;
+    return `<tr>
+      <td style="padding:13px 18px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px;font-weight:600;color:#e4ede8;width:45%">${label}</td>
+      <td style="padding:13px 18px;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1;height:7px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${col};border-radius:99px"></div>
+          </div>
+          <span style="font-size:13px;font-weight:700;color:${col};min-width:36px">${v||'–'}/10</span>
+        </div>
+      </td>
+    </tr>`;
   }
 
-  const techAvg = avg(['dribbling','shooting','passing','receiving']);
-  const physAvg = avg(['agility','balance','speed','strength']);
-  const tactAvg = avg(['awareness','decision','structure','gamemanagement']);
-  const psychAvg = avg(['confidence','competitive','concentration','communication']);
-
-  const body = `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PLYRZ — PLAYER DEVELOPMENT REPORT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-PLAYER INFORMATION
-──────────────────
-Player:       ${state.c_name||'–'}
-Age Group:    ${state.c_age||'–'}
-Position:     ${state.c_pos||'–'}
-Club:         ${state.c_club||'–'}
-Competition:  ${state.c_comp||'–'}
-Scout:        ${state.c_scout||'–'}
-Date:         ${state.c_date||'–'}
-
-CATEGORY AVERAGES
-──────────────────
-Technical:    ${techAvg}/10
-Physical:     ${physAvg}/10
-Tactical:     ${tactAvg}/10
-Psycho-Soc:   ${psychAvg}/10
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CATEGORY 01 — TECHNICAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Dribbling       ${bar(scores.dribbling)}
-Shooting        ${bar(scores.shooting)}
-Passing         ${bar(scores.passing)}
-Receiving       ${bar(scores.receiving)}
-
-Notes:
-${state.nt_technical||'–'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CATEGORY 02 — PHYSICAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Agility         ${bar(scores.agility)}
-Balance         ${bar(scores.balance)}
-Speed           ${bar(scores.speed)}
-Strength        ${bar(scores.strength)}
-
-Notes:
-${state.nt_physical||'–'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CATEGORY 03 — TACTICAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Awareness       ${bar(scores.awareness)}
-Decision Making ${bar(scores.decision)}
-Team Structure  ${bar(scores.structure)}
-Game Management ${bar(scores.gamemanagement)}
-
-Notes:
-${state.nt_tactical||'–'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CATEGORY 04 — PSYCHO-SOCIAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Confidence      ${bar(scores.confidence)}
-Comp. Spirit    ${bar(scores.competitive)}
-Concentration   ${bar(scores.concentration)}
-Communication   ${bar(scores.communication)}
-
-Notes:
-${state.nt_psychosocial||'–'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PLAYER SUMMARY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Strengths:
-${state.sum_strengths||'–'}
-
-Areas to Improve:
-${state.sum_improve||'–'}
-
-Next Steps:
-${state.sum_next||'–'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FINAL RECOMMENDATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${state.rec_main||'–'}
-
-Scout:          ${state.rec_scout||'–'}
-Organisation:   ${state.rec_org||'–'}
-Date:           ${state.rec_date||'–'}
-Signature:      ${state.rec_sig||'–'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PLYRZ © 2026 — Player Development Program
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`.trim();
-
-  try {
-    // Load EmailJS SDK
-    if (!window.emailjs) {
-      await new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-        s.onload = resolve; s.onerror = reject;
-        document.head.appendChild(s);
-      });
-      emailjs.init('uqFBj3E0R8fcCdh8c');
-    }
-
-    const res = await emailjs.send('service_br5x48g', 'template_lqbnu9b', {
-      player_name: playerName,
-      html_content: body,
-      to_email: 'luke@robertmartinroofing.co.uk',
-      subject: `PLYRZ Report – ${playerName}`,
-    });
-    const ok = res.status === 200;
-
-    document.body.removeChild(overlay);
-
-    if (ok) {
-      // Success screen
-      const success = document.createElement('div');
-      success.className = 'sending-overlay';
-      success.innerHTML = `
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#00e8a2" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
-        <p style="font-size:18px;font-weight:700;color:#00e8a2">Report Sent! ✓</p>
-        <p style="font-size:13px;color:#7a9bb5;text-align:center;padding:0 32px">Emailed to Luke@robertmartinroofing.co.uk</p>
-        <button onclick="this.parentElement.remove();document.querySelector('.submit-btn').disabled=false" style="margin-top:16px;padding:12px 28px;background:#00e8a2;color:#0d1b2a;border:none;border-radius:10px;font-family:Outfit,sans-serif;font-size:14px;font-weight:700;cursor:pointer">Done</button>`;
-      document.body.appendChild(success);
-    } else {
-      throw new Error('Failed');
-    }
-  } catch(e) {
-    document.body.removeChild(overlay);
-    btn.disabled = false;
-    const t = document.getElementById('toast');
-    t.style.background = '#ff4f4f';
-    t.textContent = '✗ Failed to send — check connection';
-    t.classList.add('show');
-    setTimeout(()=>{t.classList.remove('show');t.style.background='';},3000);
+  function section(num,title,rows,notes){
+    return `
+    <div style="margin-bottom:28px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:4px">Category ${num}</div>
+      <div style="font-size:28px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#e4ede8;margin-bottom:14px;font-family:Georgia,serif">${title}</div>
+      <table style="width:100%;border-collapse:collapse;background:#112240;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.07)">
+        <thead><tr>
+          <th style="padding:11px 18px;background:rgba(0,232,162,0.07);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;text-align:left;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.07)">Attribute</th>
+          <th style="padding:11px 18px;background:rgba(0,232,162,0.07);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;text-align:left;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.07)">Score</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      ${notes?`<div style="margin-top:10px;background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 18px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;margin-bottom:6px">Observations</div>
+        <div style="font-size:14px;color:#b0c8dc;line-height:1.8">${notes}</div>
+      </div>`:''}
+    </div>`;
   }
+
+  function avgCard(label,val){
+    const col=scoreCol(parseFloat(val));
+    return `<div style="flex:1;background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:34px;font-weight:800;color:${col};font-family:Georgia,serif;line-height:1">${val}</div>
+      <div style="font-size:10px;color:#7a9bb5;margin-top:5px;font-weight:600;letter-spacing:1px">${label}</div>
+    </div>`;
+  }
+
+  const html=`<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>PLYRZ Report – ${playerName}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0d1b2a;font-family:-apple-system,system-ui,sans-serif;padding:0}
+  @media print{
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .no-print{display:none!important}
+    .page-break{page-break-before:always}
+  }
+</style>
+</head>
+<body>
+
+<!-- PRINT BUTTON -->
+<div class="no-print" style="position:fixed;top:16px;right:16px;z-index:999;display:flex;gap:10px">
+  <button onclick="window.print()" style="background:#00e8a2;color:#0d1b2a;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">🖨 Save as PDF</button>
+  <button onclick="window.close()" style="background:#112240;color:#7a9bb5;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✕ Close</button>
+</div>
+
+<div style="max-width:680px;margin:0 auto;padding:40px 24px 60px">
+
+  <!-- COVER -->
+  <div style="text-align:center;padding:48px 32px;background:linear-gradient(160deg,#0a2540,#0d1b2a);border-radius:16px;border:1px solid rgba(255,255,255,0.08);margin-bottom:28px">
+    <svg width="60" height="68" viewBox="0 0 60 68" fill="none" style="margin-bottom:20px">
+      <path d="M30 2L57 17V51L30 66L3 51V17L30 2Z" stroke="#00e8a2" stroke-width="2" fill="rgba(0,232,162,0.06)"/>
+      <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="#00e8a2" font-family="Georgia,serif" font-size="12" letter-spacing="2">PLYRZ</text>
+    </svg>
+    <div style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:10px">Player Development Program</div>
+    <div style="font-size:48px;font-weight:800;letter-spacing:4px;color:#e4ede8;text-transform:uppercase;font-family:Georgia,serif;line-height:1">PLAYER</div>
+    <div style="font-size:26px;font-weight:700;letter-spacing:3px;color:#00e8a2;text-transform:uppercase;font-family:Georgia,serif;margin-top:4px">Development Report</div>
+    <div style="width:50px;height:2px;background:#00e8a2;margin:20px auto"></div>
+    <div style="font-size:20px;font-weight:700;color:#e4ede8;margin-top:4px">${playerName}</div>
+  </div>
+
+  <!-- PLAYER INFO -->
+  <div style="background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:22px;margin-bottom:28px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:16px">Player Information</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${[['Player Name',state.c_name],['Age Group',state.c_age],['Position',state.c_pos],['Club',state.c_club],['Competition',state.c_comp],['Scout',state.c_scout],['Organisation',state.c_org],['Date',state.c_date]].map(([l,v])=>`
+        <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px 14px">
+          <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7a9bb5;margin-bottom:4px">${l}</div>
+          <div style="font-size:14px;font-weight:600;color:#e4ede8">${v||'–'}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- CATEGORY AVERAGES -->
+  <div style="margin-bottom:28px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:12px">Category Averages</div>
+    <div style="display:flex;gap:12px">
+      ${avgCard('Technical',techAvg)}
+      ${avgCard('Physical',physAvg)}
+      ${avgCard('Tactical',tactAvg)}
+      ${avgCard('Psycho-Soc',psychAvg)}
+    </div>
+  </div>
+
+  <!-- SCORES -->
+  ${section('01','Technical',
+    scoreRow('Dribbling','dribbling')+scoreRow('Shooting','shooting')+scoreRow('Passing','passing')+scoreRow('Receiving','receiving'),
+    state.nt_technical)}
+
+  ${section('02','Physical',
+    scoreRow('Agility','agility')+scoreRow('Balance','balance')+scoreRow('Speed','speed')+scoreRow('Strength','strength'),
+    state.nt_physical)}
+
+  ${section('03','Tactical',
+    scoreRow('Awareness','awareness')+scoreRow('Decision Making','decision')+scoreRow('Team Structure','structure')+scoreRow('Game Management','gamemanagement'),
+    state.nt_tactical)}
+
+  ${section('04','Psycho-Social',
+    scoreRow('Confidence','confidence')+scoreRow('Competitive Spirit','competitive')+scoreRow('Concentration','concentration')+scoreRow('Communication','communication'),
+    state.nt_psychosocial)}
+
+  <!-- SUMMARY -->
+  <div style="margin-bottom:28px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:4px">Overview</div>
+    <div style="font-size:28px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#e4ede8;margin-bottom:16px;font-family:Georgia,serif">Player Summary</div>
+    ${[['Strengths',state.sum_strengths],['Areas to Improve',state.sum_improve],['Next Steps',state.sum_next]].map(([l,v])=>`
+    <div style="background:#112240;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:16px 18px;margin-bottom:10px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#00e8a2;margin-bottom:8px">${l}</div>
+      <div style="font-size:14px;color:#b0c8dc;line-height:1.8">${v||'–'}</div>
+    </div>`).join('')}
+  </div>
+
+  <!-- FINAL RECOMMENDATION -->
+  <div style="background:rgba(0,232,162,0.05);border:1px solid rgba(0,232,162,0.2);border-radius:12px;padding:22px;margin-bottom:28px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00e8a2;margin-bottom:12px">Final Recommendation</div>
+    <div style="font-size:14px;color:#b0c8dc;line-height:1.8;margin-bottom:18px">${state.rec_main||'–'}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1px solid rgba(0,232,162,0.15);padding-top:16px">
+      ${[['Scout',state.rec_scout],['Organisation',state.rec_org],['Date',state.rec_date],['Level Assessed',state.rec_level]].map(([l,v])=>`
+        <div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7a9bb5;margin-bottom:4px">${l}</div>
+          <div style="font-size:14px;font-weight:600;color:#e4ede8">${v||'–'}</div>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:18px;text-align:center;padding-top:16px;border-top:1px solid rgba(0,232,162,0.15)">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#7a9bb5;margin-bottom:8px">Signature</div>
+      <div style="font-size:26px;color:#e4ede8;font-style:italic">${state.rec_sig||'–'}</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="text-align:center;font-size:11px;color:#3a5a7a;letter-spacing:2px;text-transform:uppercase">PLYRZ © 2026 — Player Development Program</div>
+
+</div>
+</body></html>`;
+
+  // Open in new tab
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
 }
 
 buildAttrs();buildDots();bindInputs();
